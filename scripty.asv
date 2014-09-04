@@ -1,0 +1,3 @@
+rawdata=NSx.Data(1,1:30000*5);
+plotspect(double(rawdata));
+figure;plot(rawdata);
