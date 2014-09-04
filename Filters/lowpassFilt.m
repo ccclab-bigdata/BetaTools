@@ -13,8 +13,8 @@ function Hd = lowpassFilt
 % All frequency values are in Hz.
 Fs = 30000;  % Sampling Frequency
 
-Fpass = 300;         % Passband Frequency
-Fstop = 320;         % Stopband Frequency
+Fpass = 200;         % Passband Frequency
+Fstop = 220;         % Stopband Frequency
 Apass = 1;           % Passband Ripple (dB)
 Astop = 80;          % Stopband Attenuation (dB)
 match = 'stopband';  % Band to match exactly
