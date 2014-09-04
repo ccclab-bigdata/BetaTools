@@ -1,0 +1,121 @@
+% script to sift through cut sessions and put them in the "individual nex"
+% session folders
+
+unitNexMoved = 1;
+
+if ~unitNexMoved
+    cutSessionsRoot = fullfile('/Volumes','dan-nas3','cut sessions'); % where .plex and .nex files start
+    sessionsRoot    = fullfile('/Volumes','dan-nas3','sessions');     % where the .nex files should end up
+    possYears = {'2009', '2010'};
+
+    cutSessionsSubjectDirStruct = dir(cutSessionsRoot);
+
+    numSubjectDirs = 0;
+    for i = 1 : length(cutSessionsSubjectDirStruct)
+
+        if strcmp(cutSessionsSubjectDirStruct(i).name, '.') || ...
+           strcmp(cutSessionsSubjectDirStruct(i).name, '..')
+            continue;
+        end
+        numSubjectDirs = numSubjectDirs + 1;
+
+        cutSessionsSubjectDirs{numSubjectDirs} = ...
+            fullfile(cutSessionsRoot, cutSessionsSubjectDirStruct(i).name);
+
+    end
+
+    for iSubject = 1 : numSubjectDirs
+
+        subjectStr = ['D' cutSessionsSubjectDirs{iSubject}(end-1:end)];
+        subjectFolder = fullfile(sessionsRoot, [subjectStr 'sessions']);
+
+    %     cd(cutSessionsSubjectDirs{iSubject});
+
+        % how many cut sessions are there, and what are their names?
+        sessionPlexDirStruct = dir(cutSessionsSubjectDirs{iSubject});
+
+        numSessionPlexDirs = 0;
+        for i = 1 : length(sessionPlexDirStruct)
+        i
+            if strcmp(sessionPlexDirStruct(i).name, '.') || ...
+               strcmp(sessionPlexDirStruct(i).name, '..')
+                continue;
+            end
+            numSessionPlexDirs = numSessionPlexDirs + 1;
+
+            sessionPlexDirs{numSessionPlexDirs} = ...
+                fullfile(cutSessionsSubjectDirs{iSubject}, sessionPlexDirStruct(i).name);
+
+            % extract the date for each session
+            % look for the strings "2009" or "2010" in each folder name, and take
+            % the 8 characters starting with the year.
+
+            for iYear = 1 : length(possYears)
+                if ~isempty(findstr(sessionPlexDirs{numSessionPlexDirs}, possYears{iYear}))
+                    dateStartChar = findstr(sessionPlexDirs{numSessionPlexDirs}, possYears{iYear});
+                    curDate = sessionPlexDirs{numSessionPlexDirs}(dateStartChar:dateStartChar+7);
+                    break;
+                end
+            end
+
+            sessionDir = fullfile(subjectFolder, [subjectStr curDate], ...
+                [subjectStr curDate '_individual_nex']);
+            if ~isdir(sessionDir); mkdir(sessionDir); end
+
+            % find all .nex files in the "cut sessions" subdirectory for the
+            % current session
+            cd(sessionPlexDirs{numSessionPlexDirs})
+            nexStruct = dir('*.nex');
+
+            numNex = length(nexStruct);
+
+            for iNex = 1 : numNex
+                movefile(nexStruct(iNex).name, sessionDir);
+            end
+        end
+
+    end
+    
+    
+end    % if ~unitNexMoved
+
+
+
+sessionsRoot = fullfile('/Volumes','dan-nas3','sessions');     % where the .nex files should end up
+
+subjectDirStruct = dir(sessionsRoot);
+
+numSubjectDirs = 0;
+for iSubjectDir = 1 : length(subjectDirStruct)
+    
+    if strcmp(cutSessionsSubjectDirStruct(iSubjectDir).name, '.') || ...
+       strcmp(cutSessionsSubjectDirStruct(iSubjectDir).name, '..')
+        continue;
+    end
+    
+    numSubjectDirs = numSubjectDirs + 1;
+    
+    curSubjectDir = fullfile(sessionsRoot, cutSessionsSubjectDirStruct(iSubjectDir).name);
+    cd(cutSessionsSubjectDirStruct(iSubjectDir).name);
+    
+    sessionDirStruct = dir;
+    
+    for iSessionDir = 1 : length(sessionDirStruct)
+        
+        if strcmp(sessionDirStruct(iSessionDir).name, '.') || ...
+           strcmp(sessionDirStruct(iSessionDir).name, '..')
+            continue;
+        end
+        
+        cd(sessionDirStruct(iSessionDir).name);
+        
+        boxNameStruct = dir('*.box.nex');
+        if isempty(boxNameStruct); continue; end;
+        
+        nexPath = fullfile(pwd, [sessionDirStruct(iSessionDir).name '_individual_nex']);
+        
+        if ~isdir(nexPath); mkdir(nexPath); end
+        
+        movefile(boxNameStruct(1).name, nexPath);
+    end
+end

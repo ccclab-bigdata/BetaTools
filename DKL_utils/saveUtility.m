@@ -1,0 +1,31 @@
+function saveUtility(filename, varargin)
+
+% function to save variables to a .mat file. The purpose is to allow
+% saving during parallel processing across cores using a parfor loop in the
+% calling function (the "save" command is not allowed within a parfor
+% loop).
+
+% INPUTS:
+%   filename - a string containing the name of the file to which the data
+%       will be saved
+
+% varargs:
+%   each pair of varargs consist of a variable name followed by the data
+%   contained within that variable. For example, 
+%   saveUtility('testfile','x',y) will store the data in variable y under
+%   the name "x" within the file "testfile". An arbitrary number of
+%   variable name/value pairs may be used.
+
+vars_to_save = '';
+for iarg = 1 : 2 : nargin - 1
+    
+    eval([varargin{iarg} '= varargin{iarg + 1};']);
+    if iarg == 1
+        vars_to_save = ['''' varargin{iarg} ''''];
+    else
+        vars_to_save = [vars_to_save ', ''' varargin{iarg} ''''];
+    end
+    
+end
+
+eval(['save(filename, ' vars_to_save ');']);

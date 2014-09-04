@@ -1,0 +1,25 @@
+% script to make session folders
+
+targetDir = fullfile('/Volumes','dan','sessions');
+
+cd(targetDir)
+
+baseName = 'D222009';
+startDate = [2009 08 12];
+endDate = [2009 11 13];
+
+numDays = datenum(endDate) - datenum(startDate);
+
+for i = 0 : numDays
+    i
+    
+    curDate = datevec(datenum(startDate) + i);
+    if curDate(3) < 10
+        dirName = [baseName num2str(curDate(2)) '0' num2str(curDate(3))];
+    else
+        dirName = [baseName num2str(curDate(2)) num2str(curDate(3))];
+    end    % end if curDate(3) < 10
+    
+    mkdir(dirName);
+    
+end    % end for i...

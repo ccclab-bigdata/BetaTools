@@ -1,0 +1,194 @@
+function [varargout] = phase_estimator(t_s, t_p, p2p_cutoff, bin_angle, varargin)
+%function phase_estimator(t_s, t_p, p2p_cutoff, bin_angle)
+%t_s: spike time points (s)
+%t_p: peak time points (s)
+%p2p_cutoff: a threshold (s) to determine whether two consecutive peaks occur
+%   during a spindle. This value should be larger than the maximum p-p interval 
+%   that can be encountered, but smaller than the shortest inter-spindle interval.
+%bin_angle: bin width in degrees
+
+%Author: Murat Okatan 04/23/2003
+
+%version 5. In computing firing probability, take into account periods that don't
+%   contain spike too.
+%version 4. Variable argument 5: Optional figure name.
+%version 3. Computes the significance of Rayleigh's Z.
+%version 2. Compute the average p2p interval duration and estimate the average
+%   time difference between spike timing and peak occurrence.
+%version 1. Compute the phase of spike firing relative to peaks.
+
+makePlots = 0;  % added 08/19/2010 DL
+
+if isempty(t_s) || isempty(t_p) || bin_angle<=0 || bin_angle>=360,
+    return;
+end
+pL=length(t_p);
+
+if pL==1,
+    return;
+end
+
+if nargin==5,
+    fig_name=varargin{1};
+    if isempty(fig_name),
+        errordlg('Empty figure name');
+        fig_name = [];
+%         return;
+    end
+else
+    fig_name=[];    
+end
+
+if nargin == 6
+    makePlots = varargin{2};
+end
+
+bin_angle_r = bin_angle/180*pi;
+
+t_s=reshape(t_s, 1, length(t_s));
+t_p=reshape(t_p, 1, length(t_p));
+
+phase_vector=[];
+period_vector=[];
+period_counter=0;
+missed_period_counter=0;
+for i=1:pL-1,
+    
+    current_period=diff(t_p(i:i+1));
+    
+    %Are these peaks within a spindle?
+    if current_period>p2p_cutoff,
+        continue;
+    end
+    
+    %Counts valid periods.
+    period_counter=period_counter+1;
+    
+    %Find the spikes between these peaks
+    if 1==pL-1,
+        spike_indeces=find(t_s>=t_p(i) & t_s<t_p(i+1));
+    else
+        spike_indeces=find(t_s>=t_p(i) & t_s<=t_p(i+1));
+    end
+    
+    if isempty(spike_indeces),
+        missed_period_counter=missed_period_counter+1;
+        continue;
+    end
+    
+    current_phases=(t_s(spike_indeces)-t_p(i))/current_period*2*pi;
+    phase_vector=[phase_vector current_phases];        
+    period_vector=[period_vector current_period];
+end
+
+if isempty(phase_vector),
+    msgbox('No spikes found between two consecutive peaks.');
+    return;
+end
+Np=length(phase_vector);
+
+[to, ro]=rose(phase_vector, 360/bin_angle);
+ro=ro/sum(ro)*2;
+
+mean_compex=mean(exp(sqrt(-1)*phase_vector));
+phase_r=angle(mean_compex);
+phase_d=phase_r/pi*180;
+
+phase_dev_r=sqrt(2*(1-abs(mean_compex)));
+phase_dev_d=phase_dev_r/pi*180;
+
+mean_time_diff=phase_r/2/pi*mean(period_vector);
+
+if ~isempty(fig_name),
+    figure('Name', fig_name);
+else
+    figure;
+end
+subplot(1, 2, 1);
+if abs(mean_compex)>max(ro),
+    CH=compass(real(mean_compex), imag(mean_compex));
+    hold on;
+    CHp=compass(real(mean_compex*exp(sqrt(-1)*phase_dev_r)), imag(mean_compex*exp(sqrt(-1)*phase_dev_r)), '-.');
+    CHn=compass(real(mean_compex*exp(-sqrt(-1)*phase_dev_r)), imag(mean_compex*exp(-sqrt(-1)*phase_dev_r)), '-.');
+    P=polar(to, ro, 'r');
+else
+    P=polar(to, ro, 'r');
+    hold on;
+    CH=compass(real(mean_compex), imag(mean_compex));
+    CHp=compass(real(mean_compex*exp(sqrt(-1)*phase_dev_r)), imag(mean_compex*exp(sqrt(-1)*phase_dev_r)), '-.');
+    CHn=compass(real(mean_compex*exp(-sqrt(-1)*phase_dev_r)), imag(mean_compex*exp(-sqrt(-1)*phase_dev_r)), '-.');
+end
+set(CH, 'LineWidth', 2);
+
+%msg=sprintf(...
+%    'Phase (mean +/- angular deviation): %.3e rad +/- %.3e rad, %.3e deg +/- %.3e deg', ...
+%    phase_r, phase_dev_r, phase_d, phase_dev_d);
+msg=sprintf(...
+    'Phase (mean +/- angular deviation): %.3e deg +/- %.3e deg', ...
+    phase_d, phase_dev_d);
+msg=sprintf(...
+    '%s\nPeriod (mean +/- standard dev.): %.3e s +/- %.3e s', ...
+    msg, mean(period_vector), std(period_vector));
+title(msg);
+msg=sprintf(...
+    'Average time difference (s) (spike-peak):');
+msg=sprintf(...
+    '%s %.3e', msg, mean_time_diff);
+%msg=sprintf(...
+%    '%s\nBy average phase: %.3e +/- %.3e; By average period: %.3e +/- %.3e', ...
+%    msg, mean(period_vector)*phase_r/2/pi, abs(std(period_vector)*phase_r/2/pi), ...
+%         phase_r/2/pi*mean(period_vector), mean(period_vector)*phase_dev_r/2/pi);
+%msg=sprintf(...
+%    'Time difference (s) (spike-peak, [min mean max]):');
+%msg=sprintf(...
+%    '%s [%.3e %.3e %.3e]', msg, min_time_diff, mean_time_diff, max_time_diff);
+msg=sprintf(...
+    '%s\nr: %.3e, n: %d, Rayleigh''s z: %.3e, P = %.5e', ...
+    msg, abs(mean_compex), Np, Np*abs(mean_compex).^2, p_rays_z(Np*abs(mean_compex).^2, Np));
+xlabel(msg);
+
+%Now the histogram
+subplot(1, 2, 2);
+indx=phase_vector==2*pi;
+if ~isempty(indx),
+    phase_vector(indx)=phase_vector(indx)*0;
+end
+phase_vector=phase_vector/pi*180;
+
+%Get the bin edges
+histogram_x_e=0:bin_angle:360;
+if histogram_x_e(end)~=360,
+    histogram_x_e=[histogram_x_e 360];
+end
+%Get the mid-points
+histogram_x=diff(histogram_x_e)/2+histogram_x_e(1:end-1);
+
+%Get the histogram
+counts=histc(phase_vector, histogram_x_e);
+%Drop the last bin
+counts=counts(1:end-1);
+%Compute firing probability
+p_fire=counts/sum(counts)*period_counter/(period_counter+missed_period_counter);
+
+%Show two periods
+p_fire=[p_fire p_fire];
+histogram_x=[histogram_x histogram_x+360];
+bar(histogram_x, p_fire, 'b');
+
+YLim=get(gca, 'YLim')';
+YLim=YLim(:, ones(1, 3));
+Ly=[phase_d phase_d+360 phase_d+720];
+line([Ly;Ly], YLim, ...
+    'Color', 'r', 'LineStyle', '-.', 'LineWidth', 2);
+%rh=rectangle('Position', [phase_d-phase_dev_d, YLim(1), phase_dev_d*2, YLim(2)], ...
+%             'EdgeColor', 'r', 'LineStyle', '-.');
+xlabel('Phase (deg)');
+ylabel('Firing probability');
+title('Phase histogram');
+set(gca, 'XTick', 0:90:720, 'XTickLabel', '0||||360||||720', ...
+    'TickDir', 'out', 'XLim', [0 720], 'YLim', YLim(:, 1));
+
+set(gcf, 'Units', 'normalized', 'Position', [0.1 1/4 0.8 1/2]);
+
+varargout(1) = {phase_vector};
+varargout(2) = {period_vector};

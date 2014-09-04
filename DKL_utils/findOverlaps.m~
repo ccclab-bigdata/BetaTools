@@ -1,0 +1,72 @@
+function [C, varargout] = findOverlaps(A, B)
+%
+% usage: C = findOverlaps(A, B)
+%
+% function to find overlaps in intervals between two matrices A and B
+%
+% INPUTS:
+%    A & B are m and n x 2 matrices, respectively, where each row
+%       represents a different interval. They should contain inteegers
+%       representing indices into another vector/array
+%
+% OUTPUTS:
+%    C - p x 2 array containing areas of overlap
+%
+% varargouts:
+%   A_overlapIdx - indices into the first dimension of A that have overlaps
+%   B_overlapIdx - indices into the first dimension of B that have overlaps
+
+max_idx = max(max(max(A)), max(max(B)));
+for i = 1 : 2
+    markers{i} = false(1, max_idx);
+end
+
+for j = 1 : size(A, 1)
+    markers{1}(A(j,1):A(j,2)) = true;
+end
+
+for j = 1 : size(B, 1)
+    markers{2}(B(j,1):B(j,2)) = true;
+end
+
+C_markers = markers{1} & markers{2};
+
+% figure out the indices of which epochs were pulled out from list A and
+% list B
+overlapIdx{1} = [];
+for iEpoch = 1 : size(A, 1)
+    if any(C_markers(A(iEpoch, 1):A(iEpoch, 2)))
+        overlapIdx{1} = [A_overlapIdx, iEpoch];
+    end
+end
+
+B_overlapIdx = [];
+for iEpoch = 1 : size(A, 1)
+    if any(C_markers(B(iEpoch, 1):B(iEpoch, 2)))
+        B_overlapIdx = [B_overlapIdx, iEpoch];
+    end
+end
+
+Cdiff = diff([0 C_markers]);
+
+start_idx = find(Cdiff == 1);
+end_idx   = find(Cdiff == -1);
+
+if length(start_idx) > length(end_idx)
+    end_idx(end + 1) = length(C_markers);
+end
+
+if size(start_idx, 1) < size(start_idx, 2)
+    % if a row vector, make a column vector
+    start_idx = start_idx';
+end
+if size(end_idx, 1) < size(end_idx, 2)
+    % if a row vector, make a column vector
+    end_idx = end_idx';
+end
+
+C = [start_idx, end_idx];
+
+nout = max(nargout, 1) - 1;
+for k = 1 : nout
+    varargout(k) = {

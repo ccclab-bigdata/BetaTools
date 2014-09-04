@@ -1,0 +1,28 @@
+function [commonElements] = commonElements(A, B, varargin)
+
+% function to find the common elements of 2 or more vectors.
+
+% INPUTS:
+%   A, B - two vectors of arbitrary length
+
+% varargin:
+%   any additional vectors to check
+
+vectors{1} = A; vectors{2} = B;
+
+for iarg = 1 : nargin - 2
+    vectors{iarg + 1} = varargin{iarg};
+end
+
+commonElements = vectors{1};
+for iVector = 2 : length(vectors)
+    
+    numCommonElements = 0;
+    updatedCommonElements = [];
+    for iElement = 1 : length(commonElements)
+        
+        if any(vectors{iVector} == commonElements(iElement))
+            numCommonElements = numCommonElements + 1;
+            updatedCommonElements(numCommonElements) = ...
+                commonElements(iElement);
+            en

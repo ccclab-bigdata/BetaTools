@@ -1,0 +1,8 @@
+function pctl_val = findPercentile(data, percentile)
+
+if numel(data) == size(data, 2)
+    
+[sortVals] = sort(data);
+
+pctl_idx = size(data, 1)    
+    

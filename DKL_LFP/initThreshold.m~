@@ -1,0 +1,107 @@
+function threshold = initThreshold()
+%
+% usage: threshold = initThreshold()
+%
+% OUTPUT:
+%   threshold - structure containing thresholding information to be used in
+%       the Berke/Okaton oscillation extraction algorithm as modified by D.
+%       Leventhal. Fields are:
+%       .type - 'relative' or 'percentile'; default 'relative'. Determines
+%           whether the final threshold is determined by multiplying
+%           ".users" by ".reference", or if .percentile is simply used to
+%           set the threshold to a percentile of the overall voltage
+%           amplitude distribution ('relative' makes things work as in
+%           Berke, 2004)
+%       .reference - the voltage at which intervals that match criteria are
+%           first found; multiply by .users to get the final threshold
+%       .epsion - maximum allowable separation between successive threshold
+%          attempts as the algorithm converges
+%       .lowerbound - minimum allowable threshold in mv
+%       .users - the multiplier for threshold.reference that gives the
+%           final threshold
+%       .percentile - if "type" is 'percentile', this is the percentile
+%           used (as a decimal) to establish the threshold
+%       .ints_at_rel_threshold - the number of intervals that must be found
+%           at .reference to qualify as the reference voltage (default is
+%           1, same as in Berke, 2004)
+%       .peak_grouping_window - the minimum distance between adjacent
+%           intervals in number of cycles (at the minimum frequency). That
+%           is, if peak_grouping_window is 2, at least two periods at the 
+%           minimum frequency under threshold must exist to separate
+%           the intervals.
+%       .intervalCutoflf - number of periods at the lowest frequency in the
+%           passband that must be included in each interval (that is, the
+%           minimum interval duration in number of cycles)
+%       .interval_fusion_window - if there are fewer than this many cycles
+%           between adjacent intervals (at lowest frequency in the
+%           passband), the intervals are merged.
+%       .filter - structure with filter information containing the
+%          following fields:
+%           .cutoff - 4-element vector [f1 f2 f3 f4]; f1 is the max
+%               frequency in the lower stopband, f2 is the min frequency
+%               in the passband, f3 is the max frequency in the passband,
+%               and f4 is the min frequency in the upper stopband
+%           .b - coefficients of the 
+%           .a - 
+%        .interval_power_screen_ranges - m x 2 array; the first element
+%            in each row contains the lower frequency in that comparison
+%            band; the second element is the upper frequency. For each
+%            candidate interval, the ratio of power in the passband to
+%            power in the "power_screen_ranges" is taken; if it exceeds
+%            .interval_power_screen_ratio, the interval is accepted
+%        .interval_power_screen_ratio - the factor by which power in the
+%            passband must exceed power in the sidebands specified by
+%            .interval_power_screen_ranges
+%        .compareType - whether to compare mean power in the pass- and
+%            side-bands or total power - should be set to "mean" or "sum",
+%            respectively
+%        .excludeHVS - whether HVS should be excluded (need to be marked
+%            manually)
+%        .in_volts - the actual threshold to use; if type = 'relative',
+%            threshold.in_volts = threshold.reference * threshold.users; if
+%            type = 'percentile', .in_volts is the percentile of the
+%            overall absolute value of the voltages of the filtered signal.
+
+threshold.type = 'relative';
+threshold.reference = 0;
+threshold.epsilon = 1e-4;   % how close you have to get to the correct
+                            % value before stopping. That is, if the
+                            % algorithm is never going to converge on
+                            % exactly one accepted interval, "close
+                            % enough" is when the difference between
+                            % successive thresholds is less than
+                            % epsilon
+threshold.lowerbound = 1e-6; % threshold in mV
+
+threshold.users = 0.35;     % "J" - the number to be multiplied by the
+                            % "reference" threshold to get "in_volts"
+threshold.percentile = 0.8;
+threshold.ints_at_rel_threshold = 1;   % number of intervals that must be
+                                       % found before declaring the
+                                       % "relative" threshold - that is,
+                                       % the potential at which at least
+                                       % "ints_at_rel_threshold" exist.
+                                       
+threshold.peak_grouping_window = 2;    % the minimum distance between
+                                       % adjacent intervals in number of
+                                       % cycles. That is, if
+                                       % peak_grouping_window is 2, at
+                                       % least two periods at the minimum
+                                       % frequency under threshold must
+                                       % exist to separate intervals.
+                                       
+threshold.intervalCutoff = 2;          % number of periods at the lowest
+                                       % frequency in the passband that
+                                       % must be included in each interval
+                                       % (that is, the minimum interval
+                                       % duration in number of cycles)
+threshold.interval_fusion_window = 0;
+threshold.filter.cutoff = [15 16 24 25];
+threshold.filter.b = [];
+threshold.filter.a = 1;    % FIR filter
+threshold.interval_power_screen_ranges = [10 15; 25 35];
+threshold.interval_power_screen_ratio = 2;
+threshold.compareType = 'mean';
+threshold.excludeHVS = 1;
+
+threshold.in_volts = 0;
