@@ -1,9 +1,9 @@
 % Utah data file is 601s long
 channel=1;
 startAt=50; %seconds
-endAt=100; %seconds
+endAt=53; %seconds
 fs=30000;
-rawdata=NSx.Data(channel,((startAt*fs)+1):(endAt*fs));
+rawdata=NS5.Data(channel,((startAt*fs)+1):(endAt*fs));
 Hd=lowpassFilt;
 rawdata=filter(Hd,rawdata);
 figure('position',[0 50 1100 500]);plotspec(double(rawdata));
