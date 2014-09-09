@@ -10,3 +10,4 @@ _REMEMBER ME_
 * http://fmatoolbox.sourceforge.net/
 * http://chronux.org/chronux/images/chronux_data/manual.pdf
 * http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2934871/
+* use common avg across all 32 ch, subtract from all

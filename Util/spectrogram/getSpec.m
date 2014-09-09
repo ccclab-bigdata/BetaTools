@@ -1,6 +1,6 @@
 % Spectrogram script
 
-function Snorm=plotspec(NS_piece,plot)
+function [t,f,Snorm]=plotspec(NS_piece)
 % Set parameters
 params={};
 params.Fs=3e4;          %sampling rate
@@ -33,8 +33,8 @@ for k = 1:length(f)
 end
 
 % plot
-if(plot)
-    imagesc(t,f,Snorm);
-end
+% % if(plot)
+% %     imagesc(t,f,Snorm);
+% % end
 
 
