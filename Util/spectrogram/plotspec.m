@@ -1,9 +1,9 @@
 % Spectrogram script
 
-function Snorm=plotspec(NS_piece,plot)
+function Snorm=plotspec(NS_piece)
 % Set parameters
 params={};
-params.Fs=3e4;          %sampling rate
+params.Fs=25000;          %sampling rate
 params.fpass=[0 100];   %frequencies of interest
 params.err=0;           %error calculation [1 p] - Theoretical error bars; [2 p] - Jackknife error bars
                                    %[0 p] or 0 - no error bars) - optional. Default 0.
@@ -32,9 +32,5 @@ for k = 1:length(f)
     Snorm(k,:)=(S1(k,:)-means1(k))./means1(k);
 end
 
-% plot
-if(plot)
-    imagesc(t,f,Snorm);
-end
-
+imagesc(t,f,Snorm);
 
