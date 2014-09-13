@@ -1,0 +1,9 @@
+function plotxmax(data,xmax)
+    window = 10;
+    figure;
+    for i=1:length(xmax.loc)
+        hold on;
+        if(xma
+        plot(data(xmax.loc(i)-window:xmax.loc(i)+window));
+    end
+end

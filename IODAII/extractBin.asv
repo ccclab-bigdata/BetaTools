@@ -4,4 +4,4 @@ binData = fread(fileID,Inf,'double');
 fclose(fileID);
 
 figure;
-plot(binData);
+plot(binData2);
