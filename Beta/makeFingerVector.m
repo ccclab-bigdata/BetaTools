@@ -1,11 +1,18 @@
-function fingerArray=makeFingerArray(z)
+% Matt Gaidica, mgaidica@med.umich.edu
+% Chestek Lab, University of Michigan
+% --- release: beta ---
+
+% returns a finger angle vector where the value is the finger angle and the
+% index is the etime (the index is representative of the entire experiment
+% time.
+function fingerVector=makeFingerVector(z)
     fingerAngles = [];
     for i=1:length(z)
         [fingerAngles,pos] = avgFingerAngles(z(1,i));
-        fingerArray(1,z(1,i).ExperimentTime) = fingerAngles;
+        fingerVector(1,z(1,i).ExperimentTime) = fingerAngles;
     end
     % removes some sharp trial-by-trial artifacts
-    fingerArray = medfilt1(double(fingerArray),10);
+    fingerVector = medfilt1(double(fingerVector),10);
 end
 
 % makes no distinction between fingers
