@@ -3,8 +3,8 @@ function fingerArray=makeFingerArray(z)
     for i=1:length(z)
         [fingerAngles,pos] = avgFingerAngles(z(1,i));
         fingerArray(1,z(1,i).ExperimentTime) = fingerAngles;
-        % removes some sharp trial-by-trial artifacts
     end
+    % removes some sharp trial-by-trial artifacts
     fingerArray = medfilt1(double(fingerArray),10);
 end
 
