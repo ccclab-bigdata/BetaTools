@@ -24,7 +24,7 @@ function [t,f,Snorm]=betaspec(NS_piece)
     %       f       (frequencies)
     %       Serr    (error bars) only for err(1)>=1
     
-    [S t f]=mtspecgramc(double(NS_piece),[.5 .01],params);
+    [S t f]=mtspecgramc(double(NS_piece),[.5 .05],params);
     S1=S';
 
     % Normalize spectrum for each frequency
@@ -33,6 +33,6 @@ function [t,f,Snorm]=betaspec(NS_piece)
         Snorm(k,:)=(S1(k,:)-means1(k))./means1(k);
     end
 
-    imagesc(t,f,Snorm);
+    %imagesc(t,f,Snorm);
 end
 
