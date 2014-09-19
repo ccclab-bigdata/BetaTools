@@ -1,6 +1,6 @@
 % Spectrogram script
 
-function Snorm=betaspec(NS_piece)
+function [t,f,Snorm]=betaspec(NS_piece)
     % Set parameters
     params={};
     params.Fs=30000;          %sampling rate
