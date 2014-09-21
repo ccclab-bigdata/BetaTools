@@ -1,7 +1,7 @@
 %plot(wavefilter(double(NS5.Data(1,1:100000)),5))
 %
 samples = 1e6;
-channels = [6 7 8 9];
+channels = 1:15;
 combinedSpikePhases = [];
 for i=1:length(channels)
     spikeVector = [];
@@ -88,9 +88,9 @@ for i=1:length(channels)
             spikePhases = horzcat(spikePhases,spikePhase);
         end
     end
-    figure;
-    rose(spikePhases);
-    title(strcat('channel:',num2str(channels(i))));
+%     figure;
+%     rose(spikePhases);
+%     title(strcat('channel:',num2str(channels(i))));
     combinedSpikePhases = horzcat(combinedSpikePhases,spikePhases);
 end
 
