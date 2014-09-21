@@ -1,7 +1,7 @@
 %plot(wavefilter(double(NS5.Data(1,1:100000)),5))
 %
 samples = 1e6;
-channels = 1:15;
+channels = 9;
 combinedSpikePhases = [];
 for i=1:length(channels)
     spikeVector = [];
@@ -15,44 +15,51 @@ for i=1:length(channels)
     spikeVector = locs*(3e4^-1);
     %spikeVector = horzcat(spikeVector,allSpikes);
     
-    [t,f,Snorm]=betaspec(data);
+    [t,sinFit,Snorm]=betaspec(data);
     cSnorm = normalize(mean(Snorm)); %normalized(0-1)-compressed Snorm
     %allBeta(i,:) = cSnorm(1,:);
 
     meanBeta = mean(cSnorm,1);
+    threshold = mean(smoothData)+std(smoothData); %arbitrary
+    smoothAmt = 5;
 
     xend = samples/3e4;
     figure;
-
     % subplot(4,1,1);
     % plotSpikeRaster(allSpikes');
     % xlim([0 xend]);
     % title('All Spikes Raster');
     % ylabel('channel');
 
-    subplot(3,1,1);
-    hist(spikeVector,300);
+    subplot(3,2,1);
+    hist(spikeVector,200);
     xlim([0 xend]);
-    title('All Spikes Histogram (300 bins)');
+    title('All Spikes Histogram');
     ylabel('spike count');
+    xlabel('Time (s)');
 
-    subplot(3,1,2);
+    subplot(3,2,3);
     plot(t,meanBeta);
     hold on;
-    plot(t,smooth(meanBeta,15),'r');
+    plot(t,smooth(meanBeta,smoothAmt),'r');
+    hold on;
+    plot(t,repmat(threshold,[1 length(t)]),'-','color',[.5 .5 .5]);
     xlim([0 xend]);
     title('Beta Power (13-30Hz)');
     ylabel('normalized power');
+    xlabel('Time (s)');
+    legend('Beta','Smoothed','Thresh');
 
-    subplot(3,1,3);
-    imagesc(t,f,Snorm);
+    subplot(3,2,5);
+    imagesc(t,sinFit,Snorm);
     xlim([0 xend]);
     title('Beta Spectrogram (13-30Hz)');
     ylabel('frequency');
+    xlabel('Time (s)');
 
-    xlabel(strcat('time (s)--','channel:',num2str(channels(i))));
+    %xlabel(strcat('time (s)--','channel:',num2str(channels(i))));
 
-    threshCrossTimes = getThreshCrossTimes(meanBeta); %thresh set in function
+    threshCrossTimes = getThreshCrossTimes(meanBeta,smoothAmt,threshold); %thresh set in function
 
     % % figure;
     % % plot(meanBeta);
@@ -65,35 +72,64 @@ for i=1:length(channels)
     %[b,a]=butter(4,2*30*2/3e4,'low'); %how to do bandpass of 13-30?
     Hbp = bandpassFilt;
     spikePhases = [];
+    deltat = 0;
     for j=1:length(threshCrossTimes)
         t1 = t(threshCrossTimes{j}(1));
         t2 = t(threshCrossTimes{j}(end));
         if(t1==t2),continue,end; %for single value entries, could fix in function itself
         trialData = extractdatac(data,3e4,[t1 t2]);
-        range = 0:3e4^-1:(3e4^-1)*(length(trialData)-1);
         trialDataLP = filter(Hbp,trialData);
-        f = fit(range',trialDataLP,'sin1');
-%         figure;
-%         plot(f,range',trialDataLP);
-        amplitude = f.a1;
-        frequency = f.b1; %/(2*pi)
-        phase = f.c1; %rad2deg()
+        range = 0:3e4^-1:(3e4^-1)*(length(trialData)-1);
+        sinFit = fit(range',trialDataLP,'sin1');
+
+        amplitude = sinFit.a1;
+        w = sinFit.b1; %/(2*pi)
+        phi = sinFit.c1; %rad2deg()
 
         spikes = extractdatapt(spikeVector,[t1 t2],1); %(x,x,1) zeros them to this trial
-        %hold on;plot(spikeTimes.times,zeros(1,length(spikeTimes.times)),'o');
-        f = frequency/(2*pi);
-
+        
+        % plot one example
+        if(t2-t1 > deltat)
+            hold off;
+            subplot(3,2,2);
+            plot(range',trialData,'g');
+            hold on;
+            plot(sinFit,range',trialDataLP,'b');
+            hold on;
+            plot(spikes.times,amplitude*sin(spikes.times*w+phi),'.','color','k');
+            ylim('auto')
+            xlim([range(1) range(end)]);
+            legend('Raw','13-30Hz','Sine Fit','Spikes');
+            title(strcat('Beta Segment Ex., trial',num2str(j)));
+            ylabel('uV');
+            xlabel('Trial Time (s)');
+        end
+        
         for k=1:length(spikes.times)
-            spikePhase = atan2(sin(frequency*spikes.times(k)+phase),cos(frequency*spikes.times(k)+phase));
+            spikePhase = atan2(sin(w*spikes.times(k)+phi),cos(w*spikes.times(k)+phi));
             spikePhases = horzcat(spikePhases,spikePhase);
         end
+        deltat = t2-t1;
     end
 %     figure;
 %     rose(spikePhases);
 %     title(strcat('channel:',num2str(channels(i))));
     combinedSpikePhases = horzcat(combinedSpikePhases,spikePhases);
+    
+    subplot(3,2,4);
+    hist(rad2deg(combinedSpikePhases));
+    xlim([-180 180]);
+    title('Spike Phase Hist')
+    xlabel('Degrees');
+
+    subplot(3,2,6);
+    rose(combinedSpikePhases);
+    title('Spike Phase Rose');
+    xlabel('Degrees');
+    
+    [ax,h3]=suplabel(strcat('Channel',num2str(channels(i))),'t');
+    set(h3,'FontSize',18);
 end
 
-figure;
-rose(combinedSpikePhases);
-title('all spike phases');
+% figure;
+% rose(combinedSpikePhases);
