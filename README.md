@@ -14,6 +14,7 @@ _REMEMBER ME_
 * Iron man, May31, Run002
 
 __Fix for Figure PDF__
+    h=figure(1);
     set(h,'Units','Inches');
     pos = get(h,'Position');
     set(h,'PaperPositionMode','Auto','PaperUnits','Inches','PaperSize',[pos(3), pos(4)])

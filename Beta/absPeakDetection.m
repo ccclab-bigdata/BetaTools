@@ -1,7 +1,7 @@
 function locs=absPeakDetection(data)
-    %data = wavefilter(double(NS5.Data(1,4500:5000)),5);
-    [~,locs]=findpeaks(abs(data),'minpeakheight',300,'minpeakdistance',60,'threshold',5);
-    
+% uses absolute value
+[~,locs] = findpeaks(abs(data),'minpeakheight',300,'minpeakdistance',60,'threshold',5);
+
 % %     figure;
 % %     plot(data);
 % %     hold on;
@@ -16,5 +16,4 @@ function locs=absPeakDetection(data)
 % %         plot(data(1,locs(i)-20:locs(i)+20));
 % %     end
 
-    disp(strcat('spikes: ',int2str(length(locs))));
-end
+disp(strcat('spikes: ',int2str(length(locs))));

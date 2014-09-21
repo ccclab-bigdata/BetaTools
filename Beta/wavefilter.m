@@ -1,3 +1,4 @@
+% From Dan Leventhal
 % Matlab code for wavelet filtering.
 % This function requires the Wavelet Toolbox.
 
