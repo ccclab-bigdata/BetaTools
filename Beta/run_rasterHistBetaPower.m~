@@ -1,7 +1,7 @@
 %plot(wavefilter(double(NS5.Data(1,1:100000)),5))
 %
-samples = 1e6;
-channels = [6,7,8,9];
+samples = 5e5;
+channels = 6:9;
 combinedSpikePhases = [];
 for i=1:length(channels)
     spikeVector = [];
@@ -9,17 +9,17 @@ for i=1:length(channels)
     allSpikes = [];
 
     disp(strcat('channel:',num2str(channels(i))));
-    data = double(NS5.Data(channels(i),1:samples));
+    data = double(NS5.Data(channels(i),:));
     HPdata = wavefilter(data,5);
     locs = absPeakDetection(HPdata);
-    spikeVector = locs*(3e4^-1);
-    %spikeVector = horzcat(spikeVector,allSpikes);
+    allSpikes{i} = locs*(3e4^-1);
+    spikeVector = horzcat(spikeVector,allSpikes{i});
     
     [t,f,Snorm]=betaspec(data);
     cSnorm = normalize(mean(Snorm)); %normalized(0-1)-compressed Snorm
-    %allBeta(i,:) = cSnorm(1,:);
+    allBeta(i,:) = cSnorm(1,:);
 
-    meanBeta = mean(cSnorm,1);
+    meanBeta = mean(allBeta,1);
 
     xend = samples/3e4;
     figure;
@@ -92,16 +92,17 @@ for i=1:length(channels)
         f = frequency/(2*pi);
 
         for k=1:length(spikes.times)
-            spikePhase = atan2(sin(frequency*spikes.times(k)+phase),cos(frequency*spikes.times(k)+phase));
+            adjTime = mod(spikes.times(k),1/f);
+            spikePhase = 360*f*(adjTime+(phase/frequency));
+            if(spikePhase < 0)
+                spikePhase = 360+spikePhase;
+            end
             spikePhases = horzcat(spikePhases,spikePhase);
         end
     end
     figure;
-    rose(spikePhases);
+    rose(deg2rad(spikePhases(:)));
     title(strcat('channel:',num2str(channels(i))));
-    combinedSpikePhases = horzcat(combinedSpikePhases,spikePhases);
+    combinedSpikePhases = horzcat(SpikePhases(:));
 end
 
-figure;
-rose(combinedSpikePhases);
-title('all spike phases');

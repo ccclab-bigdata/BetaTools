@@ -1,26 +1,20 @@
-function peaksLoc=absPeakDetection(data)
-    %data = wavefilter(double(NS5.Data(1,1:1000000)),5);
-    data = wavefilter(double(data),5);
-    peaks = findpeaks(abs(data),400);
-    peaksLoc = peaks.loc;
+function locs=absPeakDetection(data)
+    %data = wavefilter(double(NS5.Data(1,4500:5000)),5);
+    [~,locs]=findpeaks(abs(data),'minpeakheight',300,'minpeakdistance',60,'threshold',5);
     
-    temp = [];
-    count = 1;
-    window = 50;
-    for i=2:length(peaksLoc)-1
-        if(peaksLoc(i+1)-peaksLoc(i) < 60)
-            if(abs(data(1,peaksLoc(i+1))) > abs(data(1,peaksLoc(i))))
-                continue;
-            end
-        end
-        temp(count) = peaksLoc(i);
-        count = count + 1;
-    end
-    peaksLoc = temp;
-    % plot all the spikes as sanity check
-    figure;
-    for i=1:length(peaksLoc)
-        hold on;
-        plot(data(1,peaksLoc(i)-20:peaksLoc(i)+20));
-    end
+% %     figure;
+% %     plot(data);
+% %     hold on;
+% %     
+% %     for i=1:length(locs);
+% %         plot(locs(i),data(locs(i)),'o');
+% %     end
+% %     % plot all the spikes as sanity check
+% %     figure;
+% %     for i=1:length(locs)
+% %         hold on;
+% %         plot(data(1,locs(i)-20:locs(i)+20));
+% %     end
+
+    disp(strcat('spikes: ',int2str(length(locs))));
 end

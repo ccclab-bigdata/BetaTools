@@ -9,8 +9,8 @@
 % figure;
 % plot(spikes','b');
 
-thresh = mean(meanBeta) + std(meanBeta);
-threshCrossTimes = getThreshCrossTimes(meanBeta,thresh);
+
+threshCrossTimes = getThreshCrossTimes(meanBeta,0.3);
 
 % % figure;
 % % plot(meanBeta);
@@ -29,7 +29,7 @@ for i=1:length(threshCrossTimes)
     trialData = extractdatac(data,3e4,[t1 t2]);
     range = 0:3e4^-1:(3e4^-1)*(length(trialData)-1);
     trialDataLP = filtfilt(b,a,trialData);
-    %figure;
+    figure;
     %could do FFT, look for peaks, dont know how to align though
     f = fit(range',trialDataLP,'sin2');
     %plot(f,range',trialDataLP);
