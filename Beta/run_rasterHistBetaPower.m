@@ -1,7 +1,7 @@
 %plot(wavefilter(double(NS5.Data(1,1:100000)),5))
 %
 samples = 1e6;
-channels = [6,7,8,9];
+channels = [6 7 8 9];
 combinedSpikePhases = [];
 for i=1:length(channels)
     spikeVector = [];
@@ -38,6 +38,8 @@ for i=1:length(channels)
 
     subplot(3,1,2);
     plot(t,meanBeta);
+    hold on;
+    plot(t,smooth(meanBeta,15),'r');
     xlim([0 xend]);
     title('Beta Power (13-30Hz)');
     ylabel('normalized power');
@@ -50,8 +52,7 @@ for i=1:length(channels)
 
     xlabel(strcat('time (s)--','channel:',num2str(channels(i))));
 
-    thresh = mean(meanBeta) + std(meanBeta);
-    threshCrossTimes = getThreshCrossTimes(meanBeta,thresh);
+    threshCrossTimes = getThreshCrossTimes(meanBeta); %thresh set in function
 
     % % figure;
     % % plot(meanBeta);
@@ -61,31 +62,22 @@ for i=1:length(channels)
     % % end
     % % hold off;
 
-    [b,a]=butter(4,2*30*2/3e4,'low'); %how to do bandpass of 13-30?
+    %[b,a]=butter(4,2*30*2/3e4,'low'); %how to do bandpass of 13-30?
+    Hbp = bandpassFilt;
     spikePhases = [];
     for j=1:length(threshCrossTimes)
         t1 = t(threshCrossTimes{j}(1));
         t2 = t(threshCrossTimes{j}(end));
-        if(t1==t2),continue,end;
+        if(t1==t2),continue,end; %for single value entries, could fix in function itself
         trialData = extractdatac(data,3e4,[t1 t2]);
         range = 0:3e4^-1:(3e4^-1)*(length(trialData)-1);
-        trialDataLP = filtfilt(b,a,trialData);
-        %figure;
-        %could do FFT, look for peaks, dont know how to align though
-        f = fit(range',trialDataLP,'sin2');
-        %plot(f,range',trialDataLP);
-        if(f.b1/(2*pi) > 13 && f.b1/(2*pi) < 30)
-            amplitude = f.a1;
-            frequency = f.b1; %/(2*pi)
-            phase = f.c1; %rad2deg()
-        elseif(f.b2/(2*pi) > 13 && f.b2/(2*pi) < 30)
-            amplitude = f.a2;
-            frequency = f.b2;
-            phase = f.c2;
-        else
-            disp('no beta sine found!');
-            continue; %handle better
-        end
+        trialDataLP = filter(Hbp,trialData);
+        f = fit(range',trialDataLP,'sin1');
+%         figure;
+%         plot(f,range',trialDataLP);
+        amplitude = f.a1;
+        frequency = f.b1; %/(2*pi)
+        phase = f.c1; %rad2deg()
 
         spikes = extractdatapt(spikeVector,[t1 t2],1); %(x,x,1) zeros them to this trial
         %hold on;plot(spikeTimes.times,zeros(1,length(spikeTimes.times)),'o');

@@ -1,7 +1,7 @@
 %plot(wavefilter(double(NS5.Data(1,1:100000)),5))
 %
-samples = 5e5;
-channels = 6:9;
+samples = 1e6;
+channels = [6,7,8,9];
 combinedSpikePhases = [];
 for i=1:length(channels)
     spikeVector = [];
@@ -9,17 +9,17 @@ for i=1:length(channels)
     allSpikes = [];
 
     disp(strcat('channel:',num2str(channels(i))));
-    data = double(NS5.Data(channels(i),:));
+    data = double(NS5.Data(channels(i),1:samples));
     HPdata = wavefilter(data,5);
     locs = absPeakDetection(HPdata);
-    allSpikes{i} = locs*(3e4^-1);
-    spikeVector = horzcat(spikeVector,allSpikes{i});
+    spikeVector = locs*(3e4^-1);
+    %spikeVector = horzcat(spikeVector,allSpikes);
     
     [t,f,Snorm]=betaspec(data);
     cSnorm = normalize(mean(Snorm)); %normalized(0-1)-compressed Snorm
-    allBeta(i,:) = cSnorm(1,:);
+    %allBeta(i,:) = cSnorm(1,:);
 
-    meanBeta = mean(allBeta,1);
+    meanBeta = mean(cSnorm,1);
 
     xend = samples/3e4;
     figure;
@@ -50,7 +50,6 @@ for i=1:length(channels)
 
     xlabel(strcat('time (s)--','channel:',num2str(channels(i))));
 
-    thresh = mean(meanBeta) + std(meanBeta);
     threshCrossTimes = getThreshCrossTimes(meanBeta,thresh);
 
     % % figure;
@@ -66,7 +65,7 @@ for i=1:length(channels)
     for j=1:length(threshCrossTimes)
         t1 = t(threshCrossTimes{j}(1));
         t2 = t(threshCrossTimes{j}(end));
-        if(t1==t2),continue,end;
+        if(t1==t2),continue,end; %for single value entries, could fix in function itself
         trialData = extractdatac(data,3e4,[t1 t2]);
         range = 0:3e4^-1:(3e4^-1)*(length(trialData)-1);
         trialDataLP = filtfilt(b,a,trialData);
@@ -92,17 +91,16 @@ for i=1:length(channels)
         f = frequency/(2*pi);
 
         for k=1:length(spikes.times)
-            adjTime = mod(spikes.times(k),1/f);
-            spikePhase = 360*f*(adjTime+(phase/frequency));
-            if(spikePhase < 0)
-                spikePhase = 360+spikePhase;
-            end
+            spikePhase = atan2(sin(frequency*spikes.times(k)+phase),cos(frequency*spikes.times(k)+phase));
             spikePhases = horzcat(spikePhases,spikePhase);
         end
     end
     figure;
-    rose(deg2rad(spikePhases(:)));
+    rose(spikePhases);
     title(strcat('channel:',num2str(channels(i))));
-    combinedSpikePhases = horzcat(SpikePhases(:));
+    combinedSpikePhases = horzcat(combinedSpikePhases,spikePhases);
 end
 
+figure;
+rose(combinedSpikePhases);
+title('all spike phases');

@@ -1,6 +1,8 @@
 % thresholds the data, splits continuous regions into seperate cells
-function out=getThreshCrossTimes(data,threshold)
-    betaCrossings = find(smooth(data) > threshold);
+function out=getThreshCrossTimes(data)
+    smoothData= smooth(data,15);
+    threshold = mean(smoothData)+std(smoothData); %arbitrary
+    betaCrossings = find(smoothData > threshold);
     ad = [diff(betaCrossings')==1 0];
     numcells = sum(ad==0);
     out = cell(1,numcells);
