@@ -25,10 +25,10 @@ plot(tsU2samples,ad(tsU2samples),'o','color','r');
 figure;
 for i=1:length(tsU1samples)
     hold on;
-    plot(ad(tsU1samples(i)-20:tsU1samples(i)+20),'k');
+    plot(ad(tsU1samples(i)-20:tsU1samples(i)+20),'b');
 end
 figure;
 for i=1:length(tsU2samples)
     hold on;
-    plot(ad(tsU2samples(i)-20:tsU2samples(i)+20),'k');
+    plot(ad(tsU2samples(i)-20:tsU2samples(i)+20),'r');
 end
