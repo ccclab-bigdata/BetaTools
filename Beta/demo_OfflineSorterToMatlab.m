@@ -1,0 +1,34 @@
+% (1) http://www.plexon.com/software-downloads
+% (2) under the SDKs tab download the OmniPlex and MAP Offline SDK Bundle
+% (3) extract the folders and add them to your Matlab path
+% *there are a ton of helper files, these are not the only useful two!
+
+% Ex2. read a PLX file and plot 2 units
+% [adfreq, n, ts, fn, ad] = plx_ad(filename, channel)
+[f,p] = uigetfile('.plx');
+[adfreq, n, ts, fn, ad] = plx_ad(fullfile(p,f),1);
+plot(ad,'k'); %continous data
+% [n, ts] = plx_ts(filename, channel, unit)
+[nU1,tsU1] = plx_ts(fullfile(p,f),1,1);
+[nU2,tsU2] = plx_ts(fullfile(p,f),1,2);
+% convert time stamps to samples (tsXX is in seconds)
+tsU1samples = int32(tsU1*3e4);
+tsU2samples = int32(tsU2*3e4);
+
+% circle the spikes
+hold on;
+plot(tsU1samples,ad(tsU1samples),'o','color','b');
+hold on;
+plot(tsU2samples,ad(tsU2samples),'o','color','r');
+
+% display waveforms
+figure;
+for i=1:length(tsU1samples)
+    hold on;
+    plot(ad(tsU1samples(i)-20:tsU1samples(i)+20),'k');
+end
+figure;
+for i=1:length(tsU2samples)
+    hold on;
+    plot(ad(tsU2samples(i)-20:tsU2samples(i)+20),'k');
+end
