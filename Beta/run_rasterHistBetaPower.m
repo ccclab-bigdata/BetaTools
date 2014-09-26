@@ -1,7 +1,7 @@
 %plot(wavefilter(double(NS5.Data(1,1:100000)),5))
 %
 samples = 1e6;
-channels = 9;
+channels = [9];
 combinedSpikePhases = [];
 for i=1:length(channels)
     spikeVector = [];
@@ -18,7 +18,7 @@ for i=1:length(channels)
     spikeVector = locs/3e4;
     
     % get spectogram data
-    [t,f,Snorm] = spectogramData(data,[13 30]);
+    [t,f,Snorm] = spectogramData(data,[10 40]);
     % take average of Snorm matrix and normalize it to span 0-1
     meanBeta = normalize(mean(Snorm));
     smoothBeta = smooth(meanBeta,15);
@@ -27,7 +27,7 @@ for i=1:length(channels)
     trialTimes = threshCrossTimes(smoothBeta,threshold);
 
     xend = samples/3e4;
-    figure;
+    figure('position',[0,0,1200,900]);
 
     subplot(3,2,1);
     hist(spikeVector,200);
@@ -79,13 +79,11 @@ for i=1:length(channels)
         trialData = extractdatac(data,3e4,[t1 t2]);
         trialDataBP = filter(Hbp,trialData);
         range = 0:3e4^-1:(3e4^-1)*(length(trialData)-1);
-        % fit single sine wave to data
-        sinFit = fit(range',trialDataBP,'sin1');
-        amplitude = sinFit.a1;
-        w = sinFit.b1; %/(2*pi)
-        phi = sinFit.c1; %rad2deg()
-        % extract spike times from trial window
-        spikes = extractdatapt(spikeVector,[t1 t2],1); %(x,x,1) zeros them to this trial
+        % perform hilbert transform and extract params
+        hx = hilbert(trialDataBP);
+        instPhase = atan2(imag(hx),real(hx));
+        %extract time-window of spikes, (x,x,1) zeros them to this trial
+        spikes = extractdatapt(spikeVector,[t1 t2],1); 
         
         % plot the longest trial
         if(t2-t1 > deltat)
@@ -93,40 +91,31 @@ for i=1:length(channels)
             subplot(3,2,2);
             plot(range',trialData,'g');
             hold on;
-            plot(sinFit,range',trialDataBP,'b');
+            plot(range',trialDataBP,'b');
             hold on;
-            plot(spikes.times,amplitude*sin(spikes.times*w+phi),'.','color','k');
+            plot(spikes.times,trialDataBP(int32(spikes.times*3e4)),'.','color','k');
             ylim('auto')
             xlim([range(1) range(end)]);
-            legend('Raw','13-30Hz','Sine Fit','Spikes');
-            title(strcat('Beta Segment Ex., trial',num2str(j)));
+            title(strcat('Beta Segment Ex., trial',num2str(j),'/',num2str(length(trialTimes))));
             ylabel('uV');
             xlabel('Trial Time (s)');
+            legend('Raw','13-30Hz','Spikes');
         end
-        
-        % calculate spike phase using atan2 and sin/cos components
-        for k=1:length(spikes.times)
-            spikePhase = atan2(sin(w*spikes.times(k)+phi),cos(w*spikes.times(k)+phi));
-            spikePhases = horzcat(spikePhases,spikePhase);
-        end
-        deltat = t2-t1;
+        deltat = t2-t1; %for finding longest trial
+        spikePhases = vertcat(spikePhases,instPhase(int32(spikes.times*3e4)));
     end
     % log all spikePhases (used for multiple channels)
-    combinedSpikePhases = horzcat(combinedSpikePhases,spikePhases);
     
     subplot(3,2,4);
-    hist(rad2deg(combinedSpikePhases));
+    hist(rad2deg(spikePhases));
     xlim([-180 180]);
     title('Spike Phase Hist')
     xlabel('Degrees');
 
     subplot(3,2,6);
-    rose(combinedSpikePhases);
+    rose(spikePhases);
     title('Spike Phase Rose');
     xlabel('Degrees');
-    
-    [ax,h3]=suplabel(strcat('Channel',num2str(channels(i))),'t');
-    set(h3,'FontSize',18);
 end
 
 % figure;
