@@ -10,11 +10,11 @@ function locs=absPeakDetection(data)
 % %         plot(locs(i),data(locs(i)),'o');
 % %     end
     % plot all the spikes as sanity check
-    figure;
-    for i=1:length(locs)
-        hold on;
-        plot(data(1,locs(i)-20:locs(i)+20));
-    end
-    title('Candidate Spikes');
+% %     figure;
+% %     for i=1:length(locs)
+% %         hold on;
+% %         plot(data(1,locs(i)-20:locs(i)+20));
+% %     end
+% %     title('Candidate Spikes');
 
 disp(strcat('spikes: ',int2str(length(locs))));
