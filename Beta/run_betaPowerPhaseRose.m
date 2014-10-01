@@ -1,7 +1,7 @@
 %plot(wavefilter(double(NS5.Data(1,1:100000)),5))
 %
 samples = 1e6;
-channels = [9];
+channels = [2];
 combinedSpikePhases = [];
 for i=1:length(channels)
     spikeVector = [];
@@ -18,12 +18,12 @@ for i=1:length(channels)
     spikeVector = locs/3e4;
     
     % get spectogram data
-    [t,f,Snorm] = spectogramData(data,[10 40]);
+    [t,f,Snorm] = spectogramData(data,[17 40]);
     % take average of Snorm matrix and normalize it to span 0-1
     meanBeta = normalize(mean(Snorm));
     smoothBeta = smooth(meanBeta,15);
     % set arbitrary threshold for trials
-    threshold = mean(smoothBeta)+std(smoothBeta);
+    threshold = mean(smoothBeta);%+std(smoothBeta);
     trialTimes = threshCrossTimes(smoothBeta,threshold);
 
     xend = samples/3e4;
@@ -49,7 +49,7 @@ for i=1:length(channels)
 % %     hold on; plot(t,meanGamma,'c');
     
     xlim([0 xend]);
-    title('Beta Power (13-30Hz)');
+    title('Beta Power');
     ylabel('normalized power');
     xlabel('Time (s)');
     legend('Beta','Smoothed','Thresh');
@@ -57,7 +57,7 @@ for i=1:length(channels)
     subplot(3,2,5);
     imagesc(t,f,Snorm);
     xlim([0 xend]);
-    title('Beta Spectrogram (13-30Hz)');
+    title('Beta Spectrogram');
     ylabel('frequency');
     xlabel('Time (s)');
 
@@ -99,7 +99,7 @@ for i=1:length(channels)
             title(strcat('Beta Segment Ex., trial',num2str(j),'/',num2str(length(trialTimes))));
             ylabel('uV');
             xlabel('Trial Time (s)');
-            legend('Raw','13-30Hz','Spikes');
+            legend('Raw','Beta LFP','Spikes');
         end
         deltat = t2-t1; %for finding longest trial
         spikePhases = vertcat(spikePhases,instPhase(int32(spikes.times*3e4)));

@@ -89,7 +89,7 @@ plot(tG,resampledFingerData.*smoothGamma','r','LineWidth',3);
 hold on;
 plot(tG,repmat(mean(resampledFingerData.*smoothGamma'),size(resampledFingerData)),'--','color','r');;
 xlim([0 xend]);
-title('(Finger Flexon) x (Norm. Power)');
+title('(Norm. Finger Flexion) x (Norm. Power)');
 legend('Beta','mean','Gamma','mean');
 
 subplot(2,1,2);

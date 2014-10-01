@@ -1,5 +1,5 @@
 saveDir = uigetdir;
-for i=1:32
+for i=2:2
     run_betaGammaFingerPower(NS5,NEV,z,i);
     for j=1:2
         h=figure(j);
@@ -11,4 +11,3 @@ for i=1:32
     end
     close all;
 end
-
