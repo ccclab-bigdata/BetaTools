@@ -1,7 +1,8 @@
-spikePhases = [];
-for i=1:length(spikes.times)
-    spikePhases(i)=atan2(sin(frequency*spikes.times(i)+phase),cos(frequency*spikes.times(i)+phase));
+for i=1:64
+    data = double(NS5.Data(i,:));
+    HPdata = wavefilter(data,5);
+    allData(i,:) = HPdata/1000;
 end
-% % 
-plot(range,sin(frequency*range+phase))
-hold on;plot(spikes.times,sin(frequency*spikes.times+phase),'o','color','red')
+
+ddt_write_v(fullfile('C:\Users\Matt\Desktop\svn_repository\Students\MattGaidica\Data',...
+        'starkDatach1-64.ddt'),64,length(HPdata),3e4,allData);

@@ -1,36 +1,37 @@
 %plot(wavefilter(double(NS5.Data(1,1:100000)),5))
 %
-samples = 1e6;
-channels = [2];
+
+samples = 9e6;
+channels = [11];
 combinedSpikePhases = [];
-for i=1:length(channels)
-    spikeVector = [];
+unit = 2;
+for i=1:length(channels) %REMOVE
+    spikeTimes = [];
     allBeta = [];
     allSpikes = [];
 
     disp(strcat('channel:',num2str(channels(i))));
+    
     data = double(NS5.Data(channels(i),1:samples));
     % performs high-pass wavelet filter, 5~=468Hz, see figure in docs
     HPdata = wavefilter(data,5);
-    % extract peaks based on absolute value threshold
-    locs = absPeakDetection(HPdata);
-    % convert peak location to actual spike times
-    spikeVector = locs/3e4;
+    [allTimestamps,allSnippets,allIndices] = findEventTimes(NEV,channels(i),unit);
+    spikeTimes = allTimestamps/3e4;
     
     % get spectogram data
-    [t,f,Snorm] = spectogramData(data,[17 40]);
+    [t,f,Snorm] = spectogramData(data,[40 90]);
     % take average of Snorm matrix and normalize it to span 0-1
     meanBeta = normalize(mean(Snorm));
-    smoothBeta = smooth(meanBeta,15);
+    smoothBeta = normalize(smooth(meanBeta,15));
     % set arbitrary threshold for trials
-    threshold = mean(smoothBeta);%+std(smoothBeta);
+    threshold = 0;%mean(smoothBeta);%+std(smoothBeta);
     trialTimes = threshCrossTimes(smoothBeta,threshold);
 
     xend = samples/3e4;
     figure('position',[0,0,1200,900]);
 
     subplot(3,2,1);
-    hist(spikeVector,200);
+    hist(spikeTimes,300);
     xlim([0 xend]);
     title('All Spikes Histogram');
     ylabel('spike count');
@@ -71,7 +72,7 @@ for i=1:length(channels)
 
     Hbp = bandpassFilt;
     spikePhases = [];
-    deltat = 0;
+    maxSpikes = 0;
     for j=1:length(trialTimes)
         t1 = t(trialTimes{j}(1));
         t2 = t(trialTimes{j}(end));
@@ -83,31 +84,32 @@ for i=1:length(channels)
         hx = hilbert(trialDataBP);
         instPhase = atan2(imag(hx),real(hx));
         %extract time-window of spikes, (x,x,1) zeros them to this trial
-        spikes = extractdatapt(spikeVector,[t1 t2],1); 
+        spikeTimesSubset = extractdatapt(spikeTimes,[t1 t2],1); 
         
         % plot the longest trial
-        if(t2-t1 > deltat)
+        if(length(spikeTimesSubset.times) > maxSpikes)
             hold off;
             subplot(3,2,2);
             plot(range',trialData,'g');
             hold on;
             plot(range',trialDataBP,'b');
             hold on;
-            plot(spikes.times,trialDataBP(int32(spikes.times*3e4)),'.','color','k');
+            plot(spikeTimesSubset.times,trialDataBP(int32(spikeTimesSubset.times*3e4)),'.','color','k');
             ylim('auto')
             xlim([range(1) range(end)]);
             title(strcat('Beta Segment Ex., trial',num2str(j),'/',num2str(length(trialTimes))));
             ylabel('uV');
             xlabel('Trial Time (s)');
             legend('Raw','Beta LFP','Spikes');
+            maxSpikes = length(spikeTimesSubset.times); %most spikes
         end
-        deltat = t2-t1; %for finding longest trial
-        spikePhases = vertcat(spikePhases,instPhase(int32(spikes.times*3e4)));
+        spikePhases = vertcat(spikePhases,instPhase(int32(spikeTimesSubset.times*3e4)));
     end
     % log all spikePhases (used for multiple channels)
+    combinedSpikePhases = vertcat(combinedSpikePhases,spikePhases);
     
     subplot(3,2,4);
-    hist(rad2deg(spikePhases));
+    hist(rad2deg(spikePhases),50);
     xlim([-180 180]);
     title('Spike Phase Hist')
     xlabel('Degrees');
@@ -116,6 +118,8 @@ for i=1:length(channels)
     rose(spikePhases);
     title('Spike Phase Rose');
     xlabel('Degrees');
+    
+    suptitle(strcat('Channel:',num2str(channels(i)),' Unit:',num2str(unit)));
 end
 
 % figure;

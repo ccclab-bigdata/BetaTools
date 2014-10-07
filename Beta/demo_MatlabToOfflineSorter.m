@@ -4,6 +4,8 @@
 
 % Ex1. write continuous data into .ddt file (for Offline Sorter)
 % [errCode] = ddt_write_v(filename, nch, npoints, freq, d)
+data = double(NS5.Data(3,:));
+HPdata = wavefilter(data,5);
 ddt_write_v(fullfile('C:\Users\Matt\Desktop\svn_repository\Students\MattGaidica\Data',...
-    'starkDataSet01.ddt',1,length(data),3e4,data);
+    'starkDataCh2-4.ddt'),1,length(HPdata),3e4,HPdata/1000);
 % after sorting, 'File > Export to New .PLX'

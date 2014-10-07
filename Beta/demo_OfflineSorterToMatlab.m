@@ -5,14 +5,15 @@
 
 % Ex2. read a PLX file and plot 2 units
 % [adfreq, n, ts, fn, ad] = plx_ad(filename, channel)
+channel = 11;
 [f,p] = uigetfile('.plx');
-[adfreq, n, ts, fn, ad] = plx_ad(fullfile(p,f),1);
+[adfreq, n, ts, fn, ad] = plx_ad(fullfile(p,f),channel);
 figure;
 subplot(3,1,1);
 plot(ad,'k'); %continous data
 % [n, ts] = plx_ts(filename, channel, unit)
-[nU1,tsU1] = plx_ts(fullfile(p,f),1,1);
-[nU2,tsU2] = plx_ts(fullfile(p,f),1,2);
+[nU1,tsU1] = plx_ts(fullfile(p,f),channel,1);
+[nU2,tsU2] = plx_ts(fullfile(p,f),channel,2);
 % convert time stamps to samples (tsXX is in seconds)
 tsU1samples = int32(tsU1*3e4);
 tsU2samples = int32(tsU2*3e4);
