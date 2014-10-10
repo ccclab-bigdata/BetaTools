@@ -1,6 +1,6 @@
 %plot(wavefilter(double(NS5.Data(1,1:100000)),5))
 %
-samples = 1e6;
+samples = 1e5;
 channels = 9;
 combinedSpikePhases = [];
 for i=1:length(channels)
