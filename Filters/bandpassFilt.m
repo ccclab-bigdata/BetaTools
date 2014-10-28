@@ -10,10 +10,10 @@ function Hd = bandpassFilt
 % All frequency values are in Hz.
 Fs = 30000;  % Sampling Frequency
 
-Fstop1 = 10;          % First Stopband Frequency
-Fpass1 = 13;          % First Passband Frequency
-Fpass2 = 30;          % Second Passband Frequency
-Fstop2 = 33;          % Second Stopband Frequency
+Fstop1 = 9;          % First Stopband Frequency
+Fpass1 = 10;          % First Passband Frequency
+Fpass2 = 45;          % Second Passband Frequency
+Fstop2 = 46;          % Second Stopband Frequency
 Astop1 = 3;           % First Stopband Attenuation (dB)
 Apass  = 1;           % Passband Ripple (dB)
 Astop2 = 3;           % Second Stopband Attenuation (dB)
