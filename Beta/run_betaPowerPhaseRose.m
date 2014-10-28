@@ -2,9 +2,9 @@
 %
 
 samples = 9e6;
-channels = [11];
+channels = [26,27,28,29,30,35,54,59,82];
 combinedSpikePhases = [];
-unit = 2;
+unit = 1;
 for i=1:length(channels) %REMOVE
     spikeTimes = [];
     allBeta = [];
@@ -19,7 +19,7 @@ for i=1:length(channels) %REMOVE
     spikeTimes = allTimestamps/3e4;
     
     % get spectogram data
-    [t,f,Snorm] = spectogramData(data,[40 90]);
+    [t,f,Snorm] = spectogramData(data,[17 40]);
     % take average of Snorm matrix and normalize it to span 0-1
     meanBeta = normalize(mean(Snorm));
     smoothBeta = normalize(smooth(meanBeta,15));
@@ -120,7 +120,10 @@ for i=1:length(channels) %REMOVE
     xlabel('Degrees');
     
     suptitle(strcat('Channel:',num2str(channels(i)),' Unit:',num2str(unit)));
+    
+    saveas(1,strcat('Data/Analyzed/betaRose_ch',num2str(channel),'_unit1_9e6samples_meanthresh_gamma'),'fig');
+    close;
 end
 
-% figure;
-% rose(combinedSpikePhases);
+figure;
+rose(combinedSpikePhases);

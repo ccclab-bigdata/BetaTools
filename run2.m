@@ -1,43 +1,35 @@
-waveletFunction = 'db8';
+% [B,I]=sort(meanBeta);
+% I=fliplr(I');
+% scatter(1:length(I),I) %pick all the Y-vals separated, from the left
 
-% [C,L] = wavedec(double(data),11,waveletFunction);
-% d11 = wrcoef('d',C,L,waveletFunction,11);
-% 
-% figure;
-% subplot(2,1,1);
-% plot(data);
-% hold on;
-% plot(d11,'r');
-% 
-% [t,f,Snorm]=spectogramData(data,[15 30]);
-% subplot(2,1,2);
-% imagesc(t,f,Snorm);
+%peakBeta is spectogram data from ch28 over 9e6 samples
+peakBeta = [2902,2376,1801,4625,3377,4235,2138,1583,1064,573];
 
-%power = (sum(d11.^2))/length(d11);
+allSpects = {};
+for i=1:length(peakBeta)
+    disp(i)
+    [p1,p2]=scaleAndRange(peakBeta(i),9e6,5991,3e4*4); %+/-1second
+    [allSpects{i},t,f]=run_allChannelSpectData(NS5,[1:96],[p1:p2],[17,40]);
+    %now we have 96 channels of beta data +/-1second
+end
 
-% T = wpdec(double(data),11,waveletFunction);
-% rwpc = wprcoef(T,(2^11)+4); %(11,1):14.6484-29.2969
-% figure;
-% subplot(2,1,1);
-% %plot(double(data),'k');
-% hold on;
-% plot(rwpc,'b','linewidth',2);
-% hold on;
-% plot(filtfilt(SOS,G,double(data)),'r');
-% axis tight;
-% 
-% [t,f,Snorm]=spectogramData(data,[10 45]);
-% subplot(2,1,2);
-% imagesc(t,f,Snorm);
-% 
-% wpt=wpdec(double(sdata),6,'db8');
-% [S,T,F]=wpspectrum(wpt,3e4,'plot');
+meanAllSpect=[];
+for i=1:length(allSpects)
+    if(i==1)
+        meanAllSpect = allSpects{1};
+    else
+        meanAllSpect = (meanAllSpect+allSpects{i})/2;
+    end
+%     figure;
+%     for j=1:size(allSpects{i},1)
+%         spect = allSpects{i};
+%         plot(spect(j,:));
+%         hold on;
+%     end
+end
 
-Fs=3e4;
-wname = 'morl'; 
-scales = 1:1:length(data);
-oefs = cwt(data,scales,wname,'lvlabs');
-
-freq = scal2frq(scales,wname,1/Fs);
-
-figure; coefsSquared = abs(coefs).^2; imagesc(coefsSquared); grid off;
+figure
+for i=1:96
+    plot(meanAllSpect(i,:));
+    hold on;
+end
