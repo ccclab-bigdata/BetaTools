@@ -2,12 +2,15 @@
 %betaLoc=1016074;
 betaLoc=1212147;
 
+load('Filters/betaButterCoeff.mat');
+load('utahChannelMap.mat');
+
 centerSpan=5000;
 %figure;
 channels=96;
 phaseSamples = 3000;
 allPhases=NaN(channels,(phaseSamples*2)+1);
-phasecMap = channelMap;
+phasecMap = utahChannelMap;
 allFiltData=[];
 
 for i=1:channels
@@ -27,16 +30,16 @@ diffAllPhases=diff(allPhases')';
 allPgds=[];
 allSpeeds=[];
 allVelocityDirs=[];
-newVideo = VideoWriter('betaPhase6.avi','Motion JPEG AVI');
+newVideo = VideoWriter('Data/betaPropHS.avi','Motion JPEG AVI');
 newVideo.Quality = 100;
 newVideo.FrameRate = 20;
 open(newVideo);
 
-for j=1:10:length(allPhases)
+for j=1:100:length(allPhases)
     h1=figure('position',[50,50,900,900]);
     subplot(3,2,3);
     for i=1:channels
-        [y,x] = find(channelMap==i);
+        [y,x] = find(utahChannelMap==i);
         phasecMap(x,y) = allPhases(i,j);
         hold on;
         plot(allFiltData(i,:));
@@ -66,12 +69,12 @@ for j=1:10:length(allPhases)
     subplot(3,2,2);
 %     surf(phasecMap);
 %     view(2);
-    %contourf(phasecMap,250,'linestyle','none');
-    quiver([1:10],[1:10],px,py);
-%     caxis([-pi pi])
-%     colorbar;
-    xlim([0 11]);
-    ylim([0 11]);
+    contourf(phasecMap,250,'linestyle','none');
+%     quiver([1:10],[1:10],px,py);
+    caxis([-pi pi])
+    colorbar;
+    xlim([1 10]);
+    ylim([1 10]);
     title('Phase (rad)');
     
     subplot(3,2,4);
@@ -93,6 +96,7 @@ for j=1:10:length(allPhases)
     text = strcat('sample:',num2str(j),', ',sprintf('%1.0f',[j/30]),'ms,pgd:',num2str(sprintf('%1.2f',[pgd])));
     set(textbox,'String',text,'position',[0,0,200,20]);
 
+    colormap('hot');
     frame = getframe(h1);
     writeVideo(newVideo,frame);
     disp(j);
