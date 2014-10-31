@@ -1,7 +1,7 @@
 sampleStart = 1e6;
 sampleEnd = 1.5e6;
 videoWindow = 2e3;
-step = 500;
+step = 50;
 
 load('Filters/betaButterCoeff.mat');
 load('utahChannelMap.mat');
