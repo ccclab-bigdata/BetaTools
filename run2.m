@@ -1,35 +1,50 @@
-% [B,I]=sort(meanBeta);
-% I=fliplr(I');
-% scatter(1:length(I),I) %pick all the Y-vals separated, from the left
-
-%peakBeta is spectogram data from ch28 over 9e6 samples
-peakBeta = [2902,2376,1801,4625,3377,4235,2138,1583,1064,573];
-
-allSpects = {};
-for i=1:length(peakBeta)
-    disp(i)
-    [p1,p2]=scaleAndRange(peakBeta(i),9e6,5991,3e4*4); %+/-1second
-    [allSpects{i},t,f]=run_allChannelSpectData(NS5,[1:96],[p1:p2],[17,40]);
-    %now we have 96 channels of beta data +/-1second
-end
-
-meanAllSpect=[];
-for i=1:length(allSpects)
-    if(i==1)
-        meanAllSpect = allSpects{1};
-    else
-        meanAllSpect = (meanAllSpect+allSpects{i})/2;
-    end
-%     figure;
-%     for j=1:size(allSpects{i},1)
-%         spect = allSpects{i};
-%         plot(spect(j,:));
-%         hold on;
+% sampleStart = zNew(1,1).CerebusTimeStart;
+% sampleStop = zNew(1,end).CerebusTimeStop;
+% meanSnorm = [];
+% for i=1:16:channels %just get representative values
+%     disp(i);
+%     data = NS5.Data(i,sampleStart:sampleStop);
+%     [t,f,Snorm] = spectogramData(data,[13 30]);
+%     if(i==1)
+%         meanSnorm = Snorm;
+%     else
+%         meanSnorm = (meanSnorm+Snorm)/2;
 %     end
+% end
+% 
+% meanSnormUpsample = [];
+% for i=1:size(meanSnorm,1)
+%     meanSnormUpsample(i,:) = interp1(1:length(meanSnorm),meanSnorm(i,:),linspace(1,length(meanSnorm),length(data)));
+% end
+% meanBeta = mean(meanSnormUpsample);
+
+%[ ]Remove extra NEV files and rerun zNew function
+moveThresh = 6e-5;
+stillThresh = 1e-5;
+allMovePower = [];
+allStillPower = [];
+for i=1:72%length(zNew)
+    sampleStart = zNew(1,i).CerebusTimeStart;
+    sampleStop = zNew(1,i).CerebusTimeStop;
+    disp((sampleStop-sampleStart)/3e4);
+    [fingerAngles,pos]=avgFingerAngles(zNew(1,i));
+    %fingerAnglesDigital = round(fingerAngles);
+    fingerAnglesUpsample = interp1(1:length(fingerAngles),fingerAngles(:),linspace(1,length(fingerAngles),sampleStop-sampleStart));
+    diffFAU = diff(smooth(fingerAnglesUpsample,500));
+    idxFAUmove = find(abs(diffFAU)>=moveThresh);
+    idxFAUstill = find(abs(diffFAU)<stillThresh);
+    
+    %add sample start to align these indexes
+    idxFAUmove = idxFAUmove + double(sampleStart);
+    idxFAUstill = idxFAUstill + double(sampleStart);
+    
+    meanFAUmovePower = mean(meanBeta(idxFAUmove));
+    meanFAUstillPower = mean(meanBeta(idxFAUstill));
+    allMovePower(i) = meanFAUmovePower;
+    allStillPower(i) = meanFAUstillPower;
 end
 
-figure
-for i=1:96
-    plot(meanAllSpect(i,:));
-    hold on;
-end
+figure;
+plot(allMovePower,'r');
+hold on;
+plot(allStillPower);

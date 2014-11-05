@@ -23,7 +23,7 @@ params.pad=1;           %padding factor for the FFT - optional (can take values 
 %       f       (frequencies)
 %       Serr    (error bars) only for err(1)>=1
 
-[S t f]=mtspecgramc(double(NS_piece),[.5 .05],params);
+[S t f]=mtspecgramc(double(NS_piece),[.5 .005],params);
 S1=S';
 
 % normalize spectrum for each frequency
