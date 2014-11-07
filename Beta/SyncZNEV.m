@@ -29,7 +29,7 @@ changed = 0;
 breakfound = 0;
 
 % First, find the corresponding Cerebus times for each trial:
-D = dir(sprintf('%s\\*.nev', NEVdir));
+D = dir(fullfile(NEVdir,'*.nev'));
 runnum = startRun;
 trialnum = 1;
 start = 1;
@@ -45,7 +45,7 @@ for i = 1:length(D)
     end
     
     % Load in current NEV:
-    nev = openNEV(sprintf('%s\\%s', NEVdir, D(i).name), 'read');
+    nev = openNEV(fullfile(NEVdir,D(i).name), 'read');
     
     % Get experiment/Cerebus times included in file:
     [etime, ctime] = FixCerebusTimes(nev);
