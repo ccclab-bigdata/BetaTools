@@ -26,7 +26,7 @@ allStillPower = [];
 for i=1:72%length(zNew)
     sampleStart = zNew(1,i).CerebusTimeStart;
     sampleStop = zNew(1,i).CerebusTimeStop;
-    disp((sampleStop-sampleStart)/3e4);
+    %disp((sampleStop-sampleStart)/3e4);
     [fingerAngles,pos]=avgFingerAngles(zNew(1,i));
     %fingerAnglesDigital = round(fingerAngles);
     fingerAnglesUpsample = interp1(1:length(fingerAngles),fingerAngles(:),linspace(1,length(fingerAngles),sampleStop-sampleStart));
@@ -46,5 +46,7 @@ end
 
 figure;
 plot(allMovePower,'r');
+line([1 73],[mean(allMovePower) mean(allMovePower)],'color','r');
 hold on;
 plot(allStillPower);
+line([1 73],[mean(allStillPower) mean(allStillPower)]);

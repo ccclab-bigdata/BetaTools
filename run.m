@@ -11,12 +11,12 @@ for i=1:16:channels %just get representative values
         meanSnorm = (meanSnorm+Snorm)/2;
     end
 end
-% 
-% meanSnormUpsample = [];
-% for i=1:size(meanSnorm,1)
-%     meanSnormUpsample(i,:) = interp1(1:length(meanSnorm),meanSnorm(i,:),linspace(1,length(meanSnorm),length(fingerVector)));
-% end
-% imagesc(1:length(meanSnormUpsample),f,meanSnormUpsample)
+
+meanSnormUpsample = [];
+for i=1:size(meanSnorm,1)
+    meanSnormUpsample(i,:) = interp1(1:length(meanSnorm),meanSnorm(i,:),linspace(1,length(meanSnorm),length(fingerVector)));
+end
+imagesc(1:length(meanSnormUpsample),f,meanSnormUpsample)
 
 
 %zNew=SyncZNEV(z,1,1)
