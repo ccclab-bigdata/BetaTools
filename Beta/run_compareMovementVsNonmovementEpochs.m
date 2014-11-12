@@ -8,7 +8,7 @@
 % for i=26:28 %just get representative values
 %     disp(i);
 %     data = NS5.Data(i,allSampleStart:allSampleStop);
-%     [t,f,Snorm] = spectogramData(data,[14 30]);
+%     [t,f,Snorm] = spectogramData(data,[40 70]);
 %     if(iCount==1)
 %         meanSnorm = Snorm;
 %     else
@@ -21,8 +21,14 @@
 % for i=1:size(meanSnorm,1)
 %     meanSnormUpsample(i,:) = interp1(1:length(meanSnorm),meanSnorm(i,:),linspace(1,length(meanSnorm),length(data)));
 % end
-% meanBeta = mean(meanSnormUpsample);
-% normMeanBeta = normalize(meanBeta);
+% meanGamma = mean(meanSnormUpsample);
+% normMeanGamma = normalize(meanGamma);
+
+%just to simplify this for now
+tempMeanBeta=meanBeta;
+tempNormMeanBeta=normMeanBeta;
+meanBeta=meanGamma;
+normMeanBeta=normMeanGamma;
 
 saveDir = uigetdir;
 
@@ -60,7 +66,7 @@ for i=zStart:zStop
         break;
     end
     
-    if(false)
+    if(true)
         h1=figure('position',[0 0 700 900]);
         subplot(4,1,1);
         plot(fingerAnglesUpsample);
@@ -76,7 +82,7 @@ for i=zStart:zStop
         imagesc(length(betaWindowSpect),f,betaWindowSpect);
         hold on;
         caxis([min(betaWindowSpect(:)) max(betaWindowSpect(:))]);
-        title('Beta Power Spectrum');
+        title('Gamma Power Spectrum');
         subplot(4,1,4);
         plot(idxFAUstill,betaWindowPower(idxFAUstill),'o','color','k');
         hold on;
@@ -84,7 +90,7 @@ for i=zStart:zStop
         xlim([1 length(fingerAnglesUpsample)]);
         legend('Not Moving','Moving');
         ylabel('Norm Power');
-        title('Beta Power Assignment');
+        title('Gamma Power Assignment');
         subplot(4,1,1);
         suptitle(strcat('Samples:',num2str(sampleStart),'-',num2str(sampleStop)));
         
@@ -111,7 +117,7 @@ title('Trials');
 subplot(2,1,2);
 imagesc(t,f,Snorm);
 ylabel('Frequency (Hz)')
-title('Beta Power Spectrum');
+title('Gamma Power Spectrum');
 
 movementCount = 0;
 validTrials = 0;
