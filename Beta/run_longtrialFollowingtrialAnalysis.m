@@ -3,7 +3,7 @@ zStart = 143;
 zStop = 252;
 allSampleStart = zNew(1,zStart).CerebusTimeStart;
 allSampleStop = zNew(1,zStop).CerebusTimeStop;
-longTrial = 3e4*3;
+longTrial = 3e4/2;
 trialCount = 1;
 followerFlag = false;
 longTrialPower = [];
@@ -18,7 +18,7 @@ for i=zStart:zStop
     sampleLength = sampleStop-sampleStart;
     shiftedStart = (allSampleStart-sampleStart)+1;
     shiftedStop = shiftedStart+sampleLength;
-    if(sampleLength>longTrial && ~followerFlag)
+    if(sampleLength<longTrial && ~followerFlag)
         followerFlag = true;
         longTrialPower(trialCount) = mean(normMeanBeta(shiftedStart:shiftedStop));
     end
@@ -30,4 +30,5 @@ for i=zStart:zStop
 end
 
 disp(trialCount)
+figure
 bar([mean(longTrialPower) mean(shortTrialPower)]);
