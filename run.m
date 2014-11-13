@@ -22,7 +22,6 @@ for i=1:size(meanSnorm,1)
 end
 % imagesc(1:length(meanSnormUpsample),f,meanSnormUpsample)
 
-
 %zNew=SyncZNEV(z,1,1)
 % figure;
 % fingerVector = makeFingerVector(zNew);
