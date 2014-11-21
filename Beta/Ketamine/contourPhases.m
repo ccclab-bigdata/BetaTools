@@ -1,5 +1,5 @@
 function contourPhases(phaseMap1,phaseMap2)
-    saveFile = 'ketamine_run001_samples1-3e4.avi';
+    saveFile = 'ketamine_run001_trialStart5_30s.avi';
     saveDir = uigetdir;
     newVideo = VideoWriter(fullfile(saveDir,saveFile),'Motion JPEG AVI');
     newVideo.Quality = 100;
@@ -8,7 +8,7 @@ function contourPhases(phaseMap1,phaseMap2)
     
     h1 = figure('position',[100 100 500 700]);
     startSample = 1;
-    stopSample = 3e4;
+    stopSample = length(phaseMap1);
     for i=startSample:10:stopSample
         disp('Percent Complete:');
         disp(round((i/stopSample)*100))
