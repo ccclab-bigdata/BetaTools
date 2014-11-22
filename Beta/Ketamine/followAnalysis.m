@@ -1,3 +1,4 @@
+%[groupPhasesS1,groupPhasesM1]=followAnalysis(phasesS1,phasesM1);
 function [groupPhases1,groupPhases2]=followAnalysis(phases1,phases2)
     groupPhases1 = [];
     groupPhases2 = [];
