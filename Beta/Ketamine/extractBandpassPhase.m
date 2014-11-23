@@ -1,6 +1,5 @@
-function [phases,filtData]=extractBandpassPhase(data)
-    %load('40-70Hz_butter_30kHz.mat');
-    load('13-30Hz_butter_10kHz.mat');
+function [phases,filtData]=extractBandpassPhase(data,filt)
+    load(filt);
     phases = [];
     filtData = [];
     for i=1:size(data,1)

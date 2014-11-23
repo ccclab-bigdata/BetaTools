@@ -11,8 +11,8 @@ dataS1=NS4.Data(65:80,sampleStart:sampleStop);
 dataM1=NS5.Data(1:16,sampleStart:sampleStop);
 dataS1=NS5.Data(17:32,sampleStart:sampleStop);
 
-[phasesS1,filtDataS1] = extractBandpassPhase(dataS1);
-[phasesM1,filtDataM1] = extractBandpassPhase(dataM1);
+[phasesS1,filtDataS1] = extractBandpassPhase(dataS1,'13-30Hz_butter_10kHz.mat');
+[phasesM1,filtDataM1] = extractBandpassPhase(dataM1,'13-30Hz_butter_10kHz.mat');
 
 meanPhasesS1=mean(phasesS1);
 meanPhasesM1=mean(phasesM1);
