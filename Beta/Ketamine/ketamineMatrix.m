@@ -18,7 +18,7 @@ function allMatrices=ketamineMatrix(beforeDir,afterDir)
             dataM1 = NSx.Data(1:16,pieces(j,1):pieces(j,2));
             dataS1 = NSx.Data(end-15:end,pieces(j,1):pieces(j,2));
             
-            usefilter = '13-30Hz_butter_10kHz.mat';
+            usefilter = '4-8Hz_butter_10kHz.mat';
             [phasesS1,filtDataS1] = extractBandpassPhase(dataS1,usefilter);
             [phasesM1,filtDataM1] = extractBandpassPhase(dataM1,usefilter);
             
@@ -31,10 +31,11 @@ function allMatrices=ketamineMatrix(beforeDir,afterDir)
             end
             pieceCount = pieceCount+1;
         end
+        close(hbar);
     end
     
     chopSamples = 5*3e4; %5s @ 30kS/s
-    for i=1:1%length(beforeFiles)
+    for i=1:length(afterFiles)
         disp(afterFiles(i).name);
         NSx = openNSx(fullfile(afterDir,afterFiles(i).name),'read');
         % could average data first, assumes ch1 is representative
@@ -46,7 +47,7 @@ function allMatrices=ketamineMatrix(beforeDir,afterDir)
             dataM1 = NSx.Data(1:16,pieces(j,1):pieces(j,2));
             dataS1 = NSx.Data(end-15:end,pieces(j,1):pieces(j,2));
             
-            usefilter = '13-30Hz_butter_30kHz.mat';
+            usefilter = '4-8Hz_butter_30kHz.mat';
             [phasesS1,filtDataS1] = extractBandpassPhase(dataS1,usefilter);
             [phasesM1,filtDataM1] = extractBandpassPhase(dataM1,usefilter);
             
@@ -59,7 +60,7 @@ function allMatrices=ketamineMatrix(beforeDir,afterDir)
             end
             pieceCount = pieceCount+1;
         end
+        close(hbar);
     end
     
-    close(hbar);
 end

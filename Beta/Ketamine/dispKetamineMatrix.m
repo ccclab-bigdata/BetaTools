@@ -1,4 +1,4 @@
-function dispKetamineMatrix(allMatrices)
+function diffMatrix=dispKetamineMatrix(allMatrices)
     allMatrices = allMatrices;
     ii=size(allMatrices,1);
     diffMatrix = zeros(ii);
@@ -14,4 +14,15 @@ function dispKetamineMatrix(allMatrices)
     imagesc(diffMatrix);
     colorbar;
     colormap(gray);
+    
+    line(repmat([138],1,1086),1:1086,'color','r','LineWidth',2);
+    line(1:1086,repmat([138],1,1086),'color','r','LineWidth',2);
+    
+%     figure;
+%     plot(theta_diffMatrix(end,:),'b');
+%     hold on;plot(beta_diffMatrix(end,:),'k');
+%     hold on;plot(gamma_diffMatrix(end,:),'m');
+%     legend('theta','beta','gamma');
+%     hold on;line(repmat([138],1,1086),linspace(0,.45,1086),'color','r','LineWidth',2);
+%     xlim([1 1085]);
 end
