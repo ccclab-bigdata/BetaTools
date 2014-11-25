@@ -1,4 +1,4 @@
-function diffMatrix=dispKetamineMatrix(allMatrices)
+function diffMatrix=dispKetamineMatrix(allMatrices,ketamineLoc,plotTitle)
     allMatrices = allMatrices;
     ii=size(allMatrices,1);
     diffMatrix = zeros(ii);
@@ -14,6 +14,7 @@ function diffMatrix=dispKetamineMatrix(allMatrices)
     imagesc(diffMatrix);
     colorbar;
     colormap(gray);
+    title(plotTitle);
     
     line(repmat([138],1,1086),1:1086,'color','r','LineWidth',2);
     line(1:1086,repmat([138],1,1086),'color','r','LineWidth',2);
