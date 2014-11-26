@@ -16,8 +16,8 @@ function diffMatrix=dispKetamineMatrix(allMatrices,ketamineLoc,plotTitle)
     colormap(gray);
     title(plotTitle);
     
-    line(repmat([ketamineLoc],1,length(allMatrices)),1:length(allMatrices),'color','r','LineWidth',2);
-    line(1:length(allMatrices),repmat([ketamineLoc],1,length(allMatrices)),'color','r','LineWidth',2);
+%     line(repmat([ketamineLoc],1,length(allMatrices)),1:length(allMatrices),'color','r','LineWidth',2);
+%     line(1:length(allMatrices),repmat([ketamineLoc],1,length(allMatrices)),'color','r','LineWidth',2);
     
 %     figure;
 %     plot(theta_diffMatrix(end,:),'b');
