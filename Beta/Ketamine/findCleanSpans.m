@@ -15,7 +15,7 @@ function pieces=findCleanSpans(data,thresh,chopSamples)
             pieces = [pieces;chopItUp(startIdx,endIdx,chopSamples)];
         end
     end
-    showMeWhatHappened(data,pieces);
+    %showMeWhatHappened(data,pieces);
 end
 
 function pieces=chopItUp(startIdx,endIdx,chopSamples)
