@@ -9,7 +9,7 @@
 % nsxFiles = [beforeFilenames afterFilenames];
 
 thresh = 2e4;
-chopSamples = 20*3e4; %5s @ 30kS/s
+chopSamples = 20*3e4; %Xs @ 30kS/s
 saveDir = 'C:\Users\Matt\Desktop\svn_repository\Students\MattGaidica\Data\Analyzed\Ketamine';
 
 params.Fs=3e4;
