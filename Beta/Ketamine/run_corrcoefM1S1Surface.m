@@ -1,12 +1,12 @@
-beforeDir = uigetdir;
-beforeFiles = dir(fullfile(beforeDir,'*.ns5'));
-beforeFilenames = fileList(beforeDir,beforeFiles);
-
-afterDir = uigetdir;
-afterFiles = dir(fullfile(afterDir,'*.ns5'));
-afterFilenames = fileList(afterDir,afterFiles);
-
-nsxFiles = [beforeFilenames afterFilenames];
+% beforeDir = uigetdir;
+% beforeFiles = dir(fullfile(beforeDir,'*.ns5'));
+% beforeFilenames = fileList(beforeDir,beforeFiles);
+% 
+% afterDir = uigetdir;
+% afterFiles = dir(fullfile(afterDir,'*.ns5'));
+% afterFilenames = fileList(afterDir,afterFiles);
+% 
+% nsxFiles = [beforeFilenames afterFilenames];
 
 thresh = 2e4;
 chopSamples = 5*3e4; %5s @ 30kS/s
