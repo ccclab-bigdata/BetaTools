@@ -1,5 +1,5 @@
 function pieces=findCleanSpans(data,thresh,chopSamples)
-    threshIdx=find(abs(data(1,:))>thresh);
+    threshIdx=find(abs(data)>thresh); %identify bad areas
     pieces = [];
     for i=1:length(threshIdx)-1
         if(i==1)
@@ -11,7 +11,7 @@ function pieces=findCleanSpans(data,thresh,chopSamples)
         end
         curRange = endIdx-startIdx;
         
-        if(curRange>chopSamples)
+        if(curRange>chopSamples) %make sure range is long enough
             pieces = [pieces;chopItUp(startIdx,endIdx,chopSamples)];
         end
     end
