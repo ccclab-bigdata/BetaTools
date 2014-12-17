@@ -16,20 +16,20 @@ f = Fs/2*linspace(0,1,NFFT/2+1);
 fStart = 10;
 fEnd = 80;
 [~,fIdx]=find(f>=fStart & f<=fEnd);
-fIdx = downsample(fIdx,20);
+fIdx = downsample(fIdx,10);
 
 thresh = 1e3;
 chopSamples = L; %Xs @ 30kS/s
-channel = 12;
+
 ketamineSample = (26*60+30)*3e4; %@26:30 into recording
 jStep = 5;
 B = zeros(length(1:jStep:length(pieces)),length(fIdx),length(fIdx));
 BIC = B;
 frame = 1;
 
-for f1i=1:5:length(fIdx)
+for f1i=1:length(fIdx)
     curf1Idx = fIdx(f1i);
-    for f2i=f1i:5:length(fIdx)
+    for f2i=f1i:length(fIdx)
         curf2Idx = fIdx(f2i);
         frame = 1;
         for startPiece=1:jStep:length(pieces)-jStep %don't overrun pieces
