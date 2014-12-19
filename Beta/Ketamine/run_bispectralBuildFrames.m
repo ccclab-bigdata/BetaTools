@@ -1,7 +1,7 @@
 % should have allData and pieces variables formed
 Fs = 3e4; % Sampling frequency
 T = 1/Fs; % Sample time
-L = 5*3e4; % Length of signal
+L = 2*3e4; % Length of signal
 t = (0:L-1)*T; % Time vector
 % 
 NFFT = 2^nextpow2(L); % Next power of 2 from length of y
@@ -16,10 +16,7 @@ f = Fs/2*linspace(0,1,NFFT/2+1);
 fStart = 10;
 fEnd = 80;
 [~,fIdx]=find(f>=fStart & f<=fEnd);
-fIdx = downsample(fIdx,10);
-
-thresh = 1e3;
-chopSamples = L; %Xs @ 30kS/s
+%fIdx = downsample(fIdx,2);
 
 ketamineSample = (26*60+30)*3e4; %@26:30 into recording
 jStep = 5;

@@ -1,26 +1,25 @@
 saveDir = 'C:\Users\Matt\Desktop\svn_repository\Students\MattGaidica\Data\Analyzed\Ketamine';
 
-videoFile=fullfile(saveDir,'bispectrum10-80_morning_5sPieces_r2.avi');
+videoFile=fullfile(saveDir,'Boherence10-80_allData_2sPieces_ch3.avi');
 newVideo = VideoWriter(videoFile,'Motion JPEG AVI');
 newVideo.Quality = 100;
-newVideo.FrameRate = 20;
+newVideo.FrameRate = 30;
 open(newVideo);
 
-ketamineFrame = 38;
+ketamineFrame = 125;
 for frame=1:size(B,1)
-    h=figure('position',[0 0 800 800]);
+    h=figure('position',[0 0 500 500]);
     imagesc(f(fIdx),f(fIdx),squeeze(B(frame,:,:)));
     colormap(hot);
     colorbar;
-    %caxis([min(B(:)) max(B(:))]);
-    caxis([0 500]);
+    caxis([min(B(:)) max(B(:))]);
     xlabel('f1');
     ylabel('f2');
     ketamineState = 'OFF KETAMINE';
     if(frame>ketamineFrame)
         ketamineState = 'ON KETAMINE';
     end
-    title(['Bicoherence',ketamineState]);
+    title(['Boherence',ketamineState]);
     
     frame = getframe(h);
     writeVideo(newVideo,frame);

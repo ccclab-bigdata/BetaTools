@@ -18,16 +18,17 @@
 % title('BIC1');
 
 
-% B1=squeeze(mean(B(1:38,:,:)));
+% B1=squeeze(mean(B(120:130,:,:)));
 % B2=squeeze(mean(B(39:76,:,:)));
 % B3=squeeze(mean(B(77:114,:,:)));
 % B4=squeeze(mean(B(115:152,:,:)));
-% 
+
 % h=figure('position',[0 0 400 400]);
 % imagesc(f(fIdx),f(fIdx),B1);
 % colormap(hot);
 % colorbar;
-% caxis([min(min([B1 B2 B3 B4])) max(max([B1 B2 B3 B4]))]);
+% caxis([min(min([B1])) max(max([B1]))]);
+% %caxis([min(min([B1 B2 B3 B4])) max(max([B1 B2 B3 B4]))]);
 % xlabel('f1');
 % ylabel('f2');
 % title('B1');
@@ -36,10 +37,11 @@
 allMean=[];
 step=1;
 for i=1:step:length(B)-step
-    curB = squeeze(B(i:i+step,7,7));
+    curB = squeeze(B(i:i+step,16,16));
     allMean = [allMean mean(curB(curB~=0))];
 end
 figure; bar(allMean); ylim([min(allMean)-1 max(allMean)+1]);
+figure; plot(medfilt1(allMean,10));
 
 
 %BIC(y,x)
