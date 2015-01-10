@@ -4,7 +4,7 @@
 
 % returns a finger angle vector where the value is the finger angle and the
 % index is the etime (the index is representative of the entire experiment
-% time.
+% time)
 function fingerVector=makeFingerVector(z)
     fingerAngles = [];
     for i=1:length(z)
