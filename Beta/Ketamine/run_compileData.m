@@ -2,20 +2,20 @@
 dataDir = 'C:\Users\Matt\Desktop\svn_repository\Students\MattGaidica\Data\Raw\Spider Man\2014-11-25\Afternoon';
 NSxFiles = dir(fullfile(dataDir,'*.ns5'));
 
-channel = 3;
-
 %allData = []; % !!!UNCOMMENT FOR AFTERNOON!!!
 for fileIdx=1:length(NSxFiles)
     disp(NSxFiles(fileIdx).name);
     NSx = openNSx(fullfile(dataDir,NSxFiles(fileIdx).name),'read');
-    allData = [allData NSx.Data(channel,:)];
-    disp(['length:',num2str(length(NSx.Data(channel,:)))]);
+    allData = horzcat(allData,NSx.Data(1:16,:));
+%     for j=1:16
+%         allData(j,:) = [allData(j,:) NSx.Data(j,:)];
+%     end
 end
 
-L = 2*3e4; % Length of signal
-thresh = 1e4;
-chopSamples = L; %Xs @ 30kS/s
-pieces = findCleanSpans(allData,thresh,chopSamples);
+% L = 2*3e4; % Length of signal
+% thresh = 1e4;
+% chopSamples = L; %Xs @ 30kS/s
+% pieces = findCleanSpans(allData,thresh,chopSamples);
 % disp(['pieces:',num2str(length(pieces))]);
 
 % % 20141125-105816-001.ns5
